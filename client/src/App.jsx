@@ -1,11 +1,11 @@
 import "./App.css";
-import AuthForm from "./components/AuthForm";
 
 function App() {
   return (
     <>
-      <AuthForm type="login" />
-      <AuthForm type="register" />
+      <div className="App">
+        <h1>Task Management App</h1>
+      </div>
     </>
   );
 }
