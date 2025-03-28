@@ -1,8 +1,7 @@
 import express from "express";
 import cors from "cors";
-import mongoose from "mongoose";
+import connectDB from "./config/db.js";
 import dotenv from "dotenv";
-import userRouter from "./routes/userRouter";
 dotenv.config();
 
 const port = process.env.PORT || 3000;
@@ -16,17 +15,8 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-app.use("/api/users", userRouter);
-
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
 
-mongoose
-  .connect(process.env.MONGODB_URI)
-  .then(() => {
-    console.log("Connected to MongoDB");
-  })
-  .catch((error) => {
-    console.log("Error connecting to MongoDB", error);
-  });
+connectDB();
