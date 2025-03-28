@@ -48,4 +48,4 @@ ProjectSchema.pre("save", function (next) {
   next();
 });
 
-module.exports = mongoose.model("Project", ProjectSchema);
+export default mongoose.model("Project", ProjectSchema);
