@@ -9,10 +9,13 @@ import {
   deleteTask,
 } from "../controllers/taskController.js";
 
-import { protect } from "../middleware/auth.js";
+import { protect, admin } from "../middleware/auth.js";
 
 // Protected Routes
-taskRouter.route("/").post(protect, createTask).get(protect, getTasks);
+taskRouter
+  .route("/")
+  .post(protect, admin, createTask)
+  .get(protect, admin, getTasks);
 
 taskRouter
   .route("/:id")
