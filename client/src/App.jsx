@@ -1,10 +1,13 @@
 import "./App.css";
+import Navbar from "./components/Layout/Navbar";
+import Sidebar from "./components/Layout/Sidebar";
 
 function App() {
   return (
     <>
       <div className="App">
-        <h1>Task Management App</h1>
+        <Navbar />
+        <Sidebar />
       </div>
     </>
   );
