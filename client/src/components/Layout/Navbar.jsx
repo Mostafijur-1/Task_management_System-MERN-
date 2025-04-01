@@ -2,12 +2,8 @@ import React, { useContext } from "react";
 import { FaBell, FaSearch, FaUserCircle, FaCog } from "react-icons/fa";
 import { AuthContext } from "../Auth/AuthContext";
 
-const user = {
-  name: "John Doe",
-};
-
 const Navbar = () => {
-  // const { user, logout } = useContext(AuthContext);
+  const { user, logout } = useContext(AuthContext);
 
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
   const [notificationsOpen, setNotificationsOpen] = React.useState(false);
@@ -95,7 +91,7 @@ const Navbar = () => {
                   </div>
                 </button>
                 <button
-                  // onClick={logout}
+                  onClick={logout}
                   className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
                 >
                   Logout

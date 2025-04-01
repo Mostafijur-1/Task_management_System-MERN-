@@ -1,23 +1,46 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect, useContext } from "react";
 import authService from "../../services/authService";
 
 export const AuthContext = createContext();
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+};
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const handleError = (err) => {
+    const message =
+      err.response?.data?.message || err.message || "Authentication failed";
+    setError(message);
+    throw new Error(message);
+  };
+
   useEffect(() => {
     const loadUser = async () => {
       try {
         setLoading(true);
+        // Check localStorage first
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          setUser(JSON.parse(storedUser));
+        }
+
+        // Then verify with server
         const userData = await authService.getCurrentUser();
         setUser(userData);
         setError(null);
       } catch (err) {
-        setError(err.message);
+        localStorage.removeItem("user");
         setUser(null);
+        handleError(err);
       } finally {
         setLoading(false);
       }
@@ -34,8 +57,7 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       return userData;
     } catch (err) {
-      setError(err.message);
-      throw err;
+      return handleError(err);
     } finally {
       setLoading(false);
     }
@@ -49,8 +71,7 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       return userData;
     } catch (err) {
-      setError(err.message);
-      throw err;
+      return handleError(err);
     } finally {
       setLoading(false);
     }
@@ -60,10 +81,21 @@ export const AuthProvider = ({ children }) => {
     try {
       await authService.logout();
       setUser(null);
+      setError(null);
+      localStorage.removeItem("user");
     } catch (err) {
-      setError(err.message);
+      handleError(err);
     }
   };
+
+  // Persist user changes
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("user");
+    }
+  }, [user]);
 
   return (
     <AuthContext.Provider

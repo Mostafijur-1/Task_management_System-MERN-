@@ -12,7 +12,13 @@ const port = process.env.PORT || 3000;
 
 const app = express();
 app.use(morgan("dev"));
-app.use(cors());
+const corsOptions = {
+  origin: "http://localhost:5173", // Your frontend origin
+  credentials: true, // If you're using cookies/sessions
+  optionsSuccessStatus: 200, // For legacy browser support
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
