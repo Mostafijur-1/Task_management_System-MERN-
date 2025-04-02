@@ -140,7 +140,10 @@ const deleteTask = async (req, res) => {
     }
 
     // Ensure user can only delete their own tasks
-    if (task.createdBy.toString() !== req.user._id.toString()) {
+    if (
+      task.createdBy.toString() !== req.user._id.toString() ||
+      req.user.role !== "admin"
+    ) {
       return res
         .status(403)
         .json({ message: "Not authorized to delete this task" });

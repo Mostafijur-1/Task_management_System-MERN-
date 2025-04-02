@@ -37,11 +37,11 @@ const ProjectsPage = () => {
     setProjects(projects.filter((project) => project._id !== projectId));
   };
 
-  const filteredProjects = projects.filter(
-    (project) =>
-      project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      project.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // const filteredProjects = projects.filter(
+  //   (project) =>
+  //     project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //     project.description.toLowerCase().includes(searchTerm.toLowerCase())
+  // );
 
   return (
     <div className="px-6 py-4">
@@ -85,7 +85,7 @@ const ProjectsPage = () => {
         </div>
       ) : (
         <ProjectList
-          projects={filteredProjects}
+          projects={projects}
           onProjectDeleted={handleProjectDeleted}
         />
       )}

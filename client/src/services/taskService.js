@@ -4,6 +4,7 @@ const taskService = {
   // Get all tasks
   getAllTasks: async () => {
     const response = await api.get("/task");
+    console.log("Response from getAllTasks:", response.data);
     return response.data;
   },
 

@@ -18,6 +18,7 @@ import { useAuth } from "../components/Auth/AuthContext";
 import taskService from "../services/taskService";
 import projectService from "../services/projectService";
 import TaskItem from "../components/Tasks/TaskItem";
+import CreateProject from "../components/Projects/CreateProject";
 
 const AdminDashboard = () => {
   const [tasks, setTasks] = useState([]);
@@ -84,7 +85,7 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="flex h-screen bg-gray-100 overflow-hidden">
+    <div className="flex h-screen bg-gray-100 overflow-hidden ">
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto">
         {/* Top Navigation */}
@@ -322,6 +323,9 @@ const AdminDashboard = () => {
                 </p>
               )}
             </div>
+          </div>
+          <div className="mt-8">
+            <CreateProject />
           </div>
         </main>
       </div>
