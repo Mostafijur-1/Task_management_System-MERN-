@@ -1,9 +1,33 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { format } from "date-fns";
+import projectService from "../../services/projectService";
 
-const ProjectItem = ({ project, onDelete }) => {
-  const { _id, name, description, deadline, status, tasks = [] } = project;
+const ProjectItem = () => {
+  const { projectId } = useParams();
+  const [project, setProject] = React.useState(null);
+
+  React.useEffect(() => {
+    const fetchProject = async () => {
+      const data = await projectService.getProjectById(projectId);
+      setProject(data);
+    };
+    fetchProject();
+  }, [projectId]);
+
+  if (!project) {
+    return <div>Loading...</div>;
+  }
+
+  const { _id, name, description, status, tasks, deadline } = project;
+
+  const handleDeleteProject = async () => {
+    if (window.confirm("Are you sure you want to delete this project?")) {
+      await projectService.deleteProject(_id);
+
+      window.location.reload();
+    }
+  };
 
   const getStatusClass = (status) => {
     switch (status?.toLowerCase()) {
@@ -102,7 +126,7 @@ const ProjectItem = ({ project, onDelete }) => {
               </svg>
             </Link>
             <button
-              onClick={() => onDelete(_id)}
+              onClick={handleDeleteProject}
               className="text-gray-400 hover:text-red-500"
               title="Delete"
             >

@@ -125,8 +125,7 @@ const deleteProject = async (req, res) => {
       return res.status(404).json({ message: "Project not found" });
     }
 
-    // Only owner can delete project
-    if (project.owner.toString() !== req.user._id.toString()) {
+    if (req.user.role !== "admin") {
       return res
         .status(403)
         .json({ message: "Not authorized to delete this project" });
@@ -135,7 +134,7 @@ const deleteProject = async (req, res) => {
     // Remove all associated tasks
     await Task.deleteMany({ project: project._id });
 
-    await project.remove();
+    await Project.deleteOne({ _id: project._id });
     res.json({ message: "Project removed" });
   } catch (error) {
     res

@@ -17,6 +17,7 @@ import Register from "./components/Auth/Register";
 import Navbar from "./components/Layout/Navbar";
 import Sidebar from "./components/Layout/Sidebar";
 import AdminSidebar from "./components/Layout/AdminSidebar";
+import ProjectItem from "./components/Projects/ProjectItem";
 
 // Loading component
 const LoadingSpinner = () => (
@@ -131,6 +132,14 @@ const App = () => {
             element={
               <RoleRoute requiredRoles={["admin"]}>
                 <UsersPage />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/projects/:projectId"
+            element={
+              <RoleRoute requiredRoles={["admin", "user"]}>
+                <ProjectItem />
               </RoleRoute>
             }
           />
