@@ -1,12 +1,13 @@
-// App.js
 import React from "react";
 import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { AuthProvider, useAuth } from "./components/Auth/AuthContext";
 
 // Pages
 import Dashboard from "./pages/Dashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 import TasksPage from "./pages/TasksPage";
 import ProjectsPage from "./pages/ProjectsPage";
+import UsersPage from "./pages/UsersPage";
 
 // Auth components
 import Login from "./components/Auth/Login";
@@ -15,6 +16,7 @@ import Register from "./components/Auth/Register";
 // Layout components
 import Navbar from "./components/Layout/Navbar";
 import Sidebar from "./components/Layout/Sidebar";
+import AdminSidebar from "./components/Layout/AdminSidebar";
 
 // Loading component
 const LoadingSpinner = () => (
@@ -23,19 +25,53 @@ const LoadingSpinner = () => (
   </div>
 );
 
-// Protected layout wrapper
-const ProtectedLayout = () => {
-  const { isAuthenticated, loading } = useAuth();
+// Role-based route guard
+const RoleRoute = ({ requiredRoles, children }) => {
+  const { user, isAuthenticated, loading } = useAuth();
 
   if (loading) return <LoadingSpinner />;
   if (!isAuthenticated) return <Navigate to="/login" replace />;
+
+  // Check if user has any of the required roles
+  const hasRequiredRole = requiredRoles.some(
+    (role) => user.role && user.role.includes(role)
+  );
+
+  if (!hasRequiredRole) {
+    return <Navigate to="/access-denied" replace />;
+  }
+
+  return children;
+};
+
+const DashboardPage = () => {
+  const { user, loading } = useAuth();
+
+  if (loading) return <LoadingSpinner />;
+
+  return user.role && user.role.includes("admin") ? (
+    <AdminDashboard />
+  ) : (
+    <Dashboard />
+  );
+};
+
+// Protected layout wrapper with role-based sidebar
+const ProtectedLayout = () => {
+  const { user, isAuthenticated, loading } = useAuth();
+
+  if (loading) return <LoadingSpinner />;
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+
+  // Determine if user is an admin
+  const isAdmin = user.role && user.role.includes("admin");
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Navbar />
       <div className="flex flex-1 overflow-hidden">
         <div className="hidden md:flex md:flex-shrink-0">
-          <Sidebar />
+          {isAdmin ? <AdminSidebar /> : <Sidebar />}
         </div>
         <main className="flex-1 overflow-auto p-4 md:p-6 bg-white md:bg-transparent md:rounded-none rounded-lg shadow-sm md:shadow-none">
           <Outlet />
@@ -46,19 +82,26 @@ const ProtectedLayout = () => {
 };
 
 // Public layout wrapper
-const PublicLayout = () => (
-  <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-    <div className="w-full max-w-md">
-      <Outlet />
+const PublicLayout = () => {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) return <LoadingSpinner />;
+  if (isAuthenticated) return <Navigate to="/" replace />;
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+      <div className="w-full max-w-md">
+        <Outlet />
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const App = () => {
   return (
     <AuthProvider>
       <Routes>
-        {/* Public routes with minimal layout */}
+        {/* Public routes with redirect for authenticated users */}
         <Route element={<PublicLayout />}>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -66,9 +109,31 @@ const App = () => {
 
         {/* Protected routes with app layout */}
         <Route element={<ProtectedLayout />}>
-          <Route path="/" element={<Dashboard />} />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
+          {/* Routes accessible by all authenticated users */}
+          <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/tasks" element={<TasksPage />} />
           <Route path="/projects" element={<ProjectsPage />} />
+
+          {/* Admin only routes */}
+          <Route
+            path="/admin"
+            element={
+              <RoleRoute requiredRoles={["admin"]}>
+                <AdminDashboard />
+              </RoleRoute>
+            }
+          />
+
+          <Route
+            path="/users"
+            element={
+              <RoleRoute requiredRoles={["admin"]}>
+                <UsersPage />
+              </RoleRoute>
+            }
+          />
         </Route>
 
         {/* Redirect handling */}

@@ -23,24 +23,28 @@ export const AuthProvider = ({ children }) => {
     throw new Error(message);
   };
 
+  // Load user from localStorage or API
   useEffect(() => {
     const loadUser = async () => {
       try {
         setLoading(true);
+
         // Check localStorage first
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
           setUser(JSON.parse(storedUser));
         }
 
-        // Then verify with server
+        // Verify with the server
         const userData = await authService.getCurrentUser();
-        setUser(userData);
-        setError(null);
+        if (userData) {
+          setUser(userData);
+          localStorage.setItem("user", JSON.stringify(userData));
+        }
       } catch (err) {
         localStorage.removeItem("user");
         setUser(null);
-        handleError(err);
+        console.error("Error fetching user:", err.message);
       } finally {
         setLoading(false);
       }
@@ -53,7 +57,11 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       const userData = await authService.login(email, password);
+
+      // Update user state and localStorage
       setUser(userData);
+      localStorage.setItem("user", JSON.stringify(userData));
+
       setError(null);
       return userData;
     } catch (err) {
@@ -67,7 +75,11 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       const userData = await authService.register(name, email, password);
+
+      // Update user state and localStorage
       setUser(userData);
+      localStorage.setItem("user", JSON.stringify(userData));
+
       setError(null);
       return userData;
     } catch (err) {
@@ -81,21 +93,11 @@ export const AuthProvider = ({ children }) => {
     try {
       await authService.logout();
       setUser(null);
-      setError(null);
       localStorage.removeItem("user");
     } catch (err) {
       handleError(err);
     }
   };
-
-  // Persist user changes
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem("user", JSON.stringify(user));
-    } else {
-      localStorage.removeItem("user");
-    }
-  }, [user]);
 
   return (
     <AuthContext.Provider
@@ -106,7 +108,7 @@ export const AuthProvider = ({ children }) => {
         login,
         register,
         logout,
-        isAuthenticated: !!user,
+        isAuthenticated: !!user, // Fix: Ensure correct authentication state
       }}
     >
       {children}

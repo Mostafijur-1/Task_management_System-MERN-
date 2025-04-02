@@ -1,5 +1,6 @@
 import React, { useState, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useAuth } from "./AuthContext";
 import AuthContext from "./AuthContext";
 
 const Login = () => {
@@ -9,7 +10,8 @@ const Login = () => {
   });
   const [formError, setFormError] = useState("");
   const { login, loading } = useContext(AuthContext);
-  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  console.log("isAuthenticated:", isAuthenticated);
 
   const { email, password } = formData;
 
@@ -23,7 +25,10 @@ const Login = () => {
 
     try {
       await login(email, password);
-      navigate("/dashboard");
+
+      console.log("Login successful, navigating to dashboard...");
+
+      window.location.reload(); // Reload the page to reflect the new authentication state
     } catch (err) {
       setFormError(
         err.message || "Failed to login. Please check your credentials."

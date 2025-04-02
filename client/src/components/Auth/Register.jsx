@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import AuthContext from "./AuthContext";
 
 const Register = () => {
@@ -23,7 +23,6 @@ const Register = () => {
     confirmPassword: false,
   });
   const { register, loading } = useContext(AuthContext);
-  const navigate = useNavigate();
 
   const { name, email, password, confirmPassword } = formData;
 
@@ -97,7 +96,7 @@ const Register = () => {
 
     try {
       await register(name, email, password);
-      navigate("/dashboard");
+      window.location.reload(); // Reload the page to reflect the new authentication state
     } catch (err) {
       setFormErrors({
         ...formErrors,
