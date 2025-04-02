@@ -156,7 +156,7 @@ const deleteTask = async (req, res) => {
       });
     }
 
-    await task.remove();
+    await task.deleteOne();
 
     res.json({ message: "Task removed" });
   } catch (error) {

@@ -34,7 +34,7 @@ const CreateProject = () => {
   };
 
   return (
-    <div className="bg-white shadow rounded-lg p-6">
+    <div className="bg-white shadow rounded-lg p-6 mt-10">
       <h2 className="text-xl font-semibold text-gray-800 mb-6">
         Create New Project
       </h2>

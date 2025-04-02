@@ -19,7 +19,7 @@ const Navbar = () => {
   };
 
   return (
-    <div className="bg-white shadow-md fixed top-0 right-0 left-0 z-10 ml-64">
+    <div className="bg-white shadow-md fixed top-0 right-0 left-0 z-10 ml-64 ">
       <div className="flex justify-between items-center px-6 py-4">
         <div className="flex items-center rounded-md bg-gray-100 px-3 py-2 w-1/3">
           <FaSearch className="text-gray-500 mr-2" />

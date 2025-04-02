@@ -18,7 +18,6 @@ import { useAuth } from "../components/Auth/AuthContext";
 import taskService from "../services/taskService";
 import projectService from "../services/projectService";
 import TaskItem from "../components/Tasks/TaskItem";
-import CreateProject from "../components/Projects/CreateProject";
 
 const AdminDashboard = () => {
   const [tasks, setTasks] = useState([]);
@@ -85,37 +84,9 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="flex h-screen bg-gray-100 overflow-hidden ">
+    <div className="flex h-screen bg-gray-100 overflow-hidden">
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto">
-        {/* Top Navigation */}
-        <header className="bg-white shadow-sm">
-          <div className="px-6 py-4 flex items-center justify-between">
-            <h2 className="text-xl font-semibold">Dashboard</h2>
-            <div className="flex items-center">
-              <div className="relative mr-6">
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  className="w-64 px-4 py-2 pr-10 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-                <Search
-                  className="absolute right-3 top-2.5 text-gray-400"
-                  size={18}
-                />
-              </div>
-              <div className="flex items-center">
-                <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
-                  {user?.name?.charAt(0) || "A"}
-                </div>
-                <span className="ml-2 font-medium">
-                  {user?.name || "Admin User"}
-                </span>
-              </div>
-            </div>
-          </div>
-        </header>
-
         {/* Dashboard Content */}
         <main className="p-6">
           <h1 className="text-2xl font-bold text-gray-800 mb-6">
@@ -323,9 +294,6 @@ const AdminDashboard = () => {
                 </p>
               )}
             </div>
-          </div>
-          <div className="mt-8">
-            <CreateProject />
           </div>
         </main>
       </div>

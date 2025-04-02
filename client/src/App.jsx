@@ -18,6 +18,8 @@ import Navbar from "./components/Layout/Navbar";
 import Sidebar from "./components/Layout/Sidebar";
 import AdminSidebar from "./components/Layout/AdminSidebar";
 import ProjectItem from "./components/Projects/ProjectItem";
+import CreateTask from "./components/Tasks/CreateTask";
+import CreateProject from "./components/Projects/CreateProject";
 
 // Loading component
 const LoadingSpinner = () => (
@@ -74,7 +76,7 @@ const ProtectedLayout = () => {
         <div className="hidden md:flex md:flex-shrink-0">
           {isAdmin ? <AdminSidebar /> : <Sidebar />}
         </div>
-        <main className="flex-1 overflow-auto p-4 md:p-6 bg-white md:bg-transparent md:rounded-none rounded-lg shadow-sm md:shadow-none">
+        <main className="flex-1 overflow-auto p-4 md:p-6 bg-white md:bg-transparent md:rounded-none rounded-lg shadow-sm md:shadow-none mt-16">
           <Outlet />
         </main>
       </div>
@@ -116,6 +118,8 @@ const App = () => {
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/tasks" element={<TasksPage />} />
           <Route path="/projects" element={<ProjectsPage />} />
+          <Route path="/tasks/create" element={<CreateTask />} />
+          <Route path="/projects/create" element={<CreateProject />} />
 
           {/* Admin only routes */}
           <Route
