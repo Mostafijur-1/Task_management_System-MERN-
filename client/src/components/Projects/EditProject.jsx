@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import projectService from "../../services/projectService";
 import authService from "../../services/authService";
 
-const CreateProject = () => {
+const EditProject = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+
   const [allUsers, setAllUsers] = useState([]);
   const [selectedMembers, setSelectedMembers] = useState([]);
   const [formData, setFormData] = useState({
@@ -11,25 +14,58 @@ const CreateProject = () => {
     description: "",
     deadline: "",
     status: "planning",
-    members: [],
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
-  const navigate = useNavigate();
-
+  // Fetch project and users data
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchData = async () => {
       try {
+        setLoading(true);
+        // Fetch project data
+        const projectData = await projectService.getProjectById(id);
+
+        // Format the date for the input field (YYYY-MM-DD)
+        let formattedDate = "";
+        if (projectData.deadline) {
+          const date = new Date(projectData.deadline);
+          formattedDate = date.toISOString().split("T")[0];
+        }
+
+        setFormData({
+          name: projectData.name || "",
+          description: projectData.description || "",
+          deadline: formattedDate,
+          status: projectData.status || "planning",
+        });
+
+        // Set selected members if available
+        if (projectData.members && Array.isArray(projectData.members)) {
+          setSelectedMembers(
+            projectData.members.map((member) =>
+              typeof member === "object" ? member._id : member
+            )
+          );
+        }
+
+        // Fetch all users
         const users = await authService.getAllUsers();
         setAllUsers(users);
+
+        setError("");
       } catch (err) {
-        console.error("Error fetching users:", err.message);
+        console.error("Error fetching data:", err);
+        setError("Failed to load project data. Please try again.");
+      } finally {
+        setLoading(false);
       }
     };
-    fetchUsers();
-  }, []);
+
+    fetchData();
+  }, [id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,20 +82,29 @@ const CreateProject = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    setSubmitting(true);
     setError("");
-    formData.members = selectedMembers;
 
     try {
-      await projectService.createProject({
+      await projectService.updateProject(id, {
         ...formData,
+        members: selectedMembers,
       });
-      navigate("/projects");
+      navigate(`/projects/${id}`);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to create project");
-      setLoading(false);
+      setError(err.response?.data?.message || "Failed to update project");
+    } finally {
+      setSubmitting(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   // Filter users based on search term
   const filteredUsers = allUsers.filter((user) =>
@@ -68,9 +113,7 @@ const CreateProject = () => {
 
   return (
     <div className="bg-white shadow rounded-lg p-6 mt-10">
-      <h2 className="text-xl font-semibold text-gray-800 mb-6">
-        Create New Project
-      </h2>
+      <h2 className="text-xl font-semibold text-gray-800 mb-6">Edit Project</h2>
 
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -214,7 +257,7 @@ const CreateProject = () => {
                           key={memberId}
                           className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-1 rounded flex items-center"
                         >
-                          <span>{user?.name}</span>
+                          <span>{user?.name || "Unknown User"}</span>
                           <button
                             type="button"
                             onClick={() => handleMemberToggle(memberId)}
@@ -241,10 +284,10 @@ const CreateProject = () => {
             </button>
             <button
               type="submit"
-              disabled={loading}
+              disabled={submitting}
               className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
             >
-              {loading ? "Creating..." : "Create Project"}
+              {submitting ? "Saving..." : "Save Changes"}
             </button>
           </div>
         </div>
@@ -253,4 +296,4 @@ const CreateProject = () => {
   );
 };
 
-export default CreateProject;
+export default EditProject;

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import ProjectItem from "./ProjectItem";
 import projectService from "../../services/projectService";
 
 const ProjectList = () => {
@@ -25,16 +24,6 @@ const ProjectList = () => {
 
     fetchProjects();
   }, []);
-
-  const handleDeleteProject = async (projectId) => {
-    try {
-      await projectService.deleteProject(projectId);
-      setProjects(projects.filter((project) => project._id !== projectId));
-    } catch (err) {
-      setError("Failed to delete project. Please try again.");
-      console.error(err);
-    }
-  };
 
   if (loading) {
     return (
@@ -67,13 +56,43 @@ const ProjectList = () => {
           No projects found. Click "Create Project" to create one.
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="space-y-2">
           {projects.map((project) => (
-            <ProjectItem
+            <Link
+              to={`/projects/${project._id}`}
               key={project._id}
-              project={project}
-              onDelete={handleDeleteProject}
-            />
+              className="block border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="font-medium text-gray-800">{project.name}</h3>
+                  <p className="text-sm text-gray-500">
+                    {project.description?.substring(0, 100)}
+                    {project.description?.length > 100 ? "..." : ""}
+                  </p>
+                </div>
+                <div className="flex items-center">
+                  <span
+                    className={`inline-block px-2 py-1 text-xs rounded-full ${
+                      project.status === "completed"
+                        ? "bg-green-100 text-green-800"
+                        : project.status === "in-progress"
+                        ? "bg-blue-100 text-blue-800"
+                        : project.status === "planning"
+                        ? "bg-yellow-100 text-yellow-800"
+                        : "bg-gray-100 text-gray-800"
+                    }`}
+                  >
+                    {project.status}
+                  </span>
+                </div>
+              </div>
+              {project.deadline && (
+                <div className="mt-2 text-xs text-gray-500">
+                  Deadline: {new Date(project.deadline).toLocaleDateString()}
+                </div>
+              )}
+            </Link>
           ))}
         </div>
       )}

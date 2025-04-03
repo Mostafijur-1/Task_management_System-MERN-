@@ -20,6 +20,7 @@ import AdminSidebar from "./components/Layout/AdminSidebar";
 import ProjectItem from "./components/Projects/ProjectItem";
 import CreateTask from "./components/Tasks/CreateTask";
 import CreateProject from "./components/Projects/CreateProject";
+import EditProject from "./components/Projects/EditProject";
 
 // Loading component
 const LoadingSpinner = () => (
@@ -113,13 +114,13 @@ const App = () => {
         {/* Protected routes with app layout */}
         <Route element={<ProtectedLayout />}>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
-
           {/* Routes accessible by all authenticated users */}
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/tasks" element={<TasksPage />} />
           <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/tasks/create" element={<CreateTask />} />
           <Route path="/projects/create" element={<CreateProject />} />
+          <Route path="/projects/:id/edit" element={<EditProject />} />
 
           {/* Admin only routes */}
           <Route
@@ -130,7 +131,6 @@ const App = () => {
               </RoleRoute>
             }
           />
-
           <Route
             path="/users"
             element={

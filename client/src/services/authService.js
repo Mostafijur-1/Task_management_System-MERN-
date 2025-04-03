@@ -32,6 +32,11 @@ const authService = {
     return true;
   },
 
+  getAllUsers: async () => {
+    const response = await api.get("/user/all");
+    return response.data;
+  },
+
   // Get current user
   getCurrentUser: async () => {
     const token = localStorage.getItem("token");
